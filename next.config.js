@@ -2,10 +2,12 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    loader: 'imgix',
-    path: '',
+    layoutRaw: true,
+    loader: 'custom',
     domains: ['images.microcms-assets.io'],
   },
+  experimental: {},
+  swcMinify: true,
 }
 
 module.exports = nextConfig
