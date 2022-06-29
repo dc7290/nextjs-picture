@@ -102,8 +102,13 @@ const loader = ({
   return url.href
 }
 
-type Props = Omit<ImageProps, 'src' | 'blurDataURL' | 'loader'> & {
+type Props = Omit<
+  ImageProps,
+  'src' | 'width' | 'height' | 'blurDataURL' | 'loader'
+> & {
   src: string
+  width: number
+  height: number
   artDirevtives?: ArtDirective[]
 }
 
@@ -119,8 +124,8 @@ const MicroCMSPicture = ({
 
   const sources = getSources({
     src,
-    width: Number(width),
-    height: Number(height),
+    width: width,
+    height: height,
     quality: Number(quality),
     config: nextImageConfig,
     artDirevtives,
