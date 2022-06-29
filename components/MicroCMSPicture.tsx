@@ -53,8 +53,8 @@ export const getSources = ({
       throw Error('`artDirevtives`には配列を指定してください。')
     }
 
-    return artDirevtives
-      .map(({ src, media, width, height }) => [
+    const artDirectivesSources = artDirevtives.map(
+      ({ src, media, width, height }) => [
         ...formats.map((format) => ({
           srcSet: getSrcSet(src, format),
           type: format,
@@ -63,8 +63,16 @@ export const getSources = ({
           height,
         })),
         { srcSet: getSrcSet(src), media, width, height },
-      ])
-      .flat()
+      ]
+    )
+    const defaultSources = formats.map((format) => ({
+      srcSet: getSrcSet(src, format),
+      type: format,
+      width,
+      height,
+    }))
+
+    return [...artDirectivesSources, ...defaultSources].flat()
   }
 
   return formats.map((format) => ({

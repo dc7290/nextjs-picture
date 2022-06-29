@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom'
 
-import { render, screen } from '@testing-library/react'
+// import { render, screen } from '@testing-library/react'
 import { NextConfig } from 'next'
 import { IMAGECONFIG_DEFAULT } from '../utils/constants'
 
-import MicroCMSPicture, { getSources } from './MicroCMSPicture'
+import { getSources } from './MicroCMSPicture'
 
 const createConfig = (customConfig?: NextConfig['images']) => {
   return Object.assign(IMAGECONFIG_DEFAULT, customConfig)
@@ -105,20 +105,20 @@ describe('MicroCMSPicture', () => {
           width: 1920,
           height: 800,
         },
-        // {
-        //   height: undefined,
-        //   srcSet:
-        //     'https://remote-image/image.png?fit=max&w=640&q=75&fm=avif 640w, https://remote-image/image.png?fit=max&w=1200&q=75&fm=avif 1200w',
-        //   type: 'image/avif',
-        //   width: undefined,
-        // },
-        // {
-        //   height: undefined,
-        //   srcSet:
-        //     'https://remote-image/image.png?fit=max&w=640&q=75&fm=webp 640w, https://remote-image/image.png?fit=max&w=1200&q=75&fm=webp 1200w',
-        //   type: 'image/webp',
-        //   width: undefined,
-        // },
+        {
+          height: undefined,
+          srcSet:
+            'https://remote-image/image.png?fit=max&w=640&q=75&fm=avif 640w, https://remote-image/image.png?fit=max&w=1200&q=75&fm=avif 1200w',
+          type: 'image/avif',
+          width: undefined,
+        },
+        {
+          height: undefined,
+          srcSet:
+            'https://remote-image/image.png?fit=max&w=640&q=75&fm=webp 640w, https://remote-image/image.png?fit=max&w=1200&q=75&fm=webp 1200w',
+          type: 'image/webp',
+          width: undefined,
+        },
       ])
     })
   })
