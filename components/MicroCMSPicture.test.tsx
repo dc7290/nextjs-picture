@@ -1,26 +1,56 @@
 import '@testing-library/jest-dom'
 
-// import { render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { NextConfig } from 'next'
-import { IMAGECONFIG_DEFAULT } from '../utils/constants'
+import { imageConfigDefault } from 'next/dist/shared/lib/image-config'
+import { ReactElement } from 'react'
 
-import { getSources } from './MicroCMSPicture'
+import { getSources, Sources } from './MicroCMSPicture'
+
+jest.mock('next/head', () => {
+  return {
+    __esModule: true,
+    default: ({ children }: { children: Array<ReactElement> }) => {
+      return <>{children}</>
+    },
+  }
+})
 
 const createConfig = (customConfig?: NextConfig['images']) => {
-  return Object.assign(IMAGECONFIG_DEFAULT, customConfig)
+  return Object.assign(imageConfigDefault, customConfig)
 }
+
+const defaultSources = getSources({
+  config: createConfig({
+    deviceSizes: [640, 1200],
+  }),
+  src: 'https://remote-image/image.png',
+})
+const artDirevtionSources = getSources({
+  config: createConfig({
+    deviceSizes: [640, 1200],
+  }),
+  artDirevtives: [
+    {
+      src: 'https://remote-image/image_lg.png',
+      media: '(min-width: 1024px)',
+      width: 1920,
+      height: 1200,
+    },
+    {
+      src: 'https://remote-image/image_md.png',
+      media: '(min-width: 768px)',
+      width: 1920,
+      height: 800,
+    },
+  ],
+  src: 'https://remote-image/image.png',
+})
 
 describe('MicroCMSPicture', () => {
   describe('getSources', () => {
     it('デフォルトの動作', () => {
-      const sources = getSources({
-        config: createConfig({
-          deviceSizes: [640, 1200],
-        }),
-        src: 'https://remote-image/image.png',
-      })
-
-      expect(sources).toStrictEqual([
+      expect(defaultSources.sources).toStrictEqual([
         {
           height: undefined,
           srcSet:
@@ -36,29 +66,16 @@ describe('MicroCMSPicture', () => {
           width: undefined,
         },
       ])
+      expect(defaultSources.preloadLinks).toStrictEqual([
+        {
+          srcSet:
+            'https://remote-image/image.png?fit=max&w=640&q=75&fm=webp 640w, https://remote-image/image.png?fit=max&w=1200&q=75&fm=webp 1200w',
+          type: 'image/webp',
+        },
+      ])
     })
     it('アートディレクションの動作', () => {
-      const sources = getSources({
-        config: createConfig({
-          deviceSizes: [640, 1200],
-        }),
-        artDirevtives: [
-          {
-            src: 'https://remote-image/image_lg.png',
-            media: '(min-width: 1024px)',
-            width: 1920,
-            height: 1200,
-          },
-          {
-            src: 'https://remote-image/image_md.png',
-            media: '(min-width: 768px)',
-            width: 1920,
-            height: 800,
-          },
-        ],
-        src: 'https://remote-image/image.png',
-      })
-      expect(sources).toStrictEqual([
+      expect(artDirevtionSources.sources).toStrictEqual([
         {
           srcSet:
             'https://remote-image/image_lg.png?fit=max&w=640&q=75&fm=avif 640w, https://remote-image/image_lg.png?fit=max&w=1200&q=75&fm=avif 1200w',
@@ -120,9 +137,47 @@ describe('MicroCMSPicture', () => {
           width: undefined,
         },
       ])
+      expect(artDirevtionSources.preloadLinks).toStrictEqual([
+        {
+          media: '(min-width: 1024px)',
+          srcSet:
+            'https://remote-image/image_lg.png?fit=max&w=640&q=75&fm=webp 640w, https://remote-image/image_lg.png?fit=max&w=1200&q=75&fm=webp 1200w',
+          type: 'image/webp',
+        },
+        {
+          media: '(min-width: 768px)',
+          srcSet:
+            'https://remote-image/image_md.png?fit=max&w=640&q=75&fm=webp 640w, https://remote-image/image_md.png?fit=max&w=1200&q=75&fm=webp 1200w',
+          type: 'image/webp',
+        },
+      ])
     })
   })
 
-  it.todo('デフォルトの動作')
-  it.todo('アートディレクションの動作')
+  it('デフォルトの動作', () => {
+    render(<Sources {...defaultSources} />)
+    expect(screen.getAllByTestId('source')).toMatchSnapshot()
+  })
+  it('アートディレクションの動作', () => {
+    render(<Sources {...artDirevtionSources} />)
+    expect(screen.getAllByTestId('source')).toMatchSnapshot()
+  })
+
+  it('デフォルトの動作: priorityを設定する', () => {
+    render(<Sources {...defaultSources} priority />)
+    const preloadLink = defaultSources.preloadLinks[0]
+    expect(screen.getByTestId('link')).toHaveAttribute(
+      'imagesrcset',
+      preloadLink.srcSet
+    )
+    expect(screen.getByTestId('link')).toHaveAttribute('type', preloadLink.type)
+  })
+  it('アートディレクションの動作: priorityを設定する', () => {
+    render(<Sources {...artDirevtionSources} priority />)
+    screen.getAllByTestId('link').forEach((link, i) => {
+      const preloadLink = artDirevtionSources.preloadLinks[i]
+      expect(link).toHaveAttribute('imagesrcset', preloadLink.srcSet)
+      expect(link).toHaveAttribute('type', preloadLink.type)
+    })
+  })
 })

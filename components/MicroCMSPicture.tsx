@@ -1,6 +1,16 @@
-import { ImageConfigComplete } from 'next/dist/shared/lib/image-config'
+import {
+  ImageConfig,
+  ImageConfigComplete,
+  imageConfigDefault,
+} from 'next/dist/shared/lib/image-config'
 import Image, { ImageLoaderProps, ImageProps } from 'next/future/image'
-import { DetailedHTMLProps, SourceHTMLAttributes } from 'react'
+import Head from 'next/head'
+import {
+  DetailedHTMLProps,
+  Fragment,
+  SourceHTMLAttributes,
+  useMemo,
+} from 'react'
 import useImageConfig from '../hooks/useImageConfig'
 
 type ArtDirective = {
@@ -10,10 +20,12 @@ type ArtDirective = {
   height?: number
 }
 
-const FORMATS = ['image/avif', 'image/webp']
+const AVIF = 'image/avif'
+const WEBP = 'image/webp'
+const FORMATS = [AVIF, WEBP]
 
 type GetSourcesArgs = {
-  config: ImageConfigComplete
+  config: ImageConfig
   src: string
   width?: number
   height?: number
@@ -21,10 +33,13 @@ type GetSourcesArgs = {
   formats?: string[]
   artDirevtives?: ArtDirective[]
 }
-type GetSourcesResult = DetailedHTMLProps<
-  SourceHTMLAttributes<HTMLSourceElement>,
-  HTMLSourceElement
->[]
+type GetSourcesResult = {
+  sources: DetailedHTMLProps<
+    SourceHTMLAttributes<HTMLSourceElement>,
+    HTMLSourceElement
+  >[]
+  preloadLinks: { srcSet: string; type: string; media?: string }[]
+}
 export const getSources = ({
   config,
   src,
@@ -72,15 +87,25 @@ export const getSources = ({
       height,
     }))
 
-    return [...artDirectivesSources, ...defaultSources].flat()
+    return {
+      sources: [...artDirectivesSources, ...defaultSources].flat(),
+      preloadLinks: artDirevtives.map(({ src, media }) => ({
+        srcSet: getSrcSet(src, 'webp'),
+        type: WEBP,
+        media,
+      })),
+    }
   }
 
-  return formats.map((format) => ({
-    srcSet: getSrcSet(src, format),
-    type: format,
-    width,
-    height,
-  }))
+  return {
+    sources: formats.map((format) => ({
+      srcSet: getSrcSet(src, format),
+      type: format,
+      width,
+      height,
+    })),
+    preloadLinks: [{ srcSet: getSrcSet(src, 'webp'), type: WEBP }],
+  }
 }
 
 const normalizeSrc = (src: string): string => {
@@ -110,13 +135,58 @@ const loader = ({
   return url.href
 }
 
+type SourcesProps = GetSourcesResult & Pick<ImageProps, 'sizes' | 'priority'>
+
+export const Sources = ({
+  sources,
+  sizes = '100vw',
+  priority,
+  preloadLinks,
+}: SourcesProps) => {
+  return (
+    <>
+      {sources.map((sourceProps) => (
+        <source
+          {...(process.env.NODE_ENV === 'test'
+            ? { 'data-testid': 'source' }
+            : {})}
+          key={sourceProps.srcSet}
+          {...sourceProps}
+        />
+      ))}
+
+      {priority &&
+        preloadLinks.map((linkProps) => (
+          <Head key={linkProps.srcSet}>
+            <link
+              {...(process.env.NODE_ENV === 'test'
+                ? { 'data-testid': 'link' }
+                : {})}
+              key={'__nimg-' + linkProps.srcSet + linkProps.media + sizes}
+              rel="preload"
+              as="image"
+              type={linkProps.type}
+              media={linkProps.media}
+              imageSrcSet={linkProps.srcSet}
+              imageSizes={sizes}
+            />
+          </Head>
+        ))}
+    </>
+  )
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const configEnv = process.env.__NEXT_IMAGE_OPTS as any as ImageConfigComplete
+
 type Props = Omit<
   ImageProps,
-  'src' | 'width' | 'height' | 'blurDataURL' | 'loader'
+  'src' | 'width' | 'height' | 'blurDataURL' | 'loader' | 'alt'
 > & {
   src: string
   width: number
   height: number
+  alt: string
   artDirevtives?: ArtDirective[]
 }
 
@@ -125,32 +195,41 @@ const MicroCMSPicture = ({
   width,
   height,
   quality,
+  priority,
   artDirevtives,
   ...props
 }: Props) => {
-  const nextImageConfig = useImageConfig()
+  const configContext = useImageConfig()
+  const config: ImageConfig = useMemo(() => {
+    const c = configEnv || configContext || imageConfigDefault
+    const allSizes = [...c.deviceSizes, ...c.imageSizes].sort((a, b) => a - b)
+    const deviceSizes = c.deviceSizes.sort((a, b) => a - b)
+    return { ...c, allSizes, deviceSizes }
+  }, [configContext])
 
   const sources = getSources({
     src,
     width: width,
     height: height,
     quality: Number(quality),
-    config: nextImageConfig,
+    config: config,
     artDirevtives,
   })
 
   return (
     <picture>
+      <Sources {...sources} sizes={props.sizes} priority={priority} />
       <Image
+        {...props}
         src={src}
         loader={loader}
-        alt={props.alt}
         blurDataURL={
           props.placeholder === 'blur'
             ? loader({ src, width: 8, quality: 10 })
             : undefined
         }
-        {...props}
+        alt={props.alt}
+        loading={priority ? 'eager' : props.loading}
       />
     </picture>
   )
