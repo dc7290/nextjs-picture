@@ -1,5 +1,5 @@
 import { ImageConfigComplete } from 'next/dist/shared/lib/image-config'
-import Image, { ImageLoader, ImageLoaderProps, ImageProps } from 'next/image'
+import Image, { ImageLoaderProps, ImageProps } from 'next/future/image'
 import { DetailedHTMLProps, SourceHTMLAttributes } from 'react'
 import useImageConfig from '../hooks/useImageConfig'
 
