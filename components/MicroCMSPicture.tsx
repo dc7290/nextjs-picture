@@ -102,7 +102,7 @@ const loader = ({
   return url.href
 }
 
-type Props = Omit<ImageProps, 'blurDataURL' | 'loader'> & {
+type Props = Omit<ImageProps, 'src' | 'blurDataURL' | 'loader'> & {
   src: string
   artDirevtives?: ArtDirective[]
 }
@@ -128,7 +128,17 @@ const MicroCMSPicture = ({
 
   return (
     <picture>
-      <Image src={src} loader={loader} layout="raw" {...props} />
+      <Image
+        src={src}
+        loader={loader}
+        alt={props.alt}
+        blurDataURL={
+          props.placeholder === 'blur'
+            ? loader({ src, width: 8, quality: 10 })
+            : undefined
+        }
+        {...props}
+      />
     </picture>
   )
 }
