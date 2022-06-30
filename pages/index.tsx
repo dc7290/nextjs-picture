@@ -8,9 +8,9 @@ type MicroCMSApiImage = {
   art_directive_image: {
     fieldId: 'art_directive_image'
     default_image: MicroCMSImage
-    md_image: MicroCMSImage
-    lg_image: MicroCMSImage
-    '2xl_image': MicroCMSImage
+    md_image?: MicroCMSImage
+    lg_image?: MicroCMSImage
+    '2xl_image'?: MicroCMSImage
   }
 }
 
@@ -18,8 +18,8 @@ type Props = MicroCMSApiImage & MicroCMSDate
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   const content = await createClient({
-    serviceDomain: process.env.MICROCMS_SERVICE_DOMAIN,
-    apiKey: process.env.MICROCMS_API_KEY,
+    serviceDomain: process.env.MICROCMS_SERVICE_DOMAIN ?? '',
+    apiKey: process.env.MICROCMS_API_KEY ?? '',
   }).getObject<MicroCMSApiImage>({ endpoint: 'image' })
 
   return {
@@ -29,7 +29,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
   }
 }
 
-const Home: NextPage<Props> = ({ default_image }) => {
+const Home: NextPage<Props> = ({ default_image, art_directive_image }) => {
   return (
     <div>
       <Head>
@@ -44,10 +44,41 @@ const Home: NextPage<Props> = ({ default_image }) => {
           src={default_image.url}
           width={default_image.width}
           height={default_image.height}
+          placeholder="blur"
+          priority
           alt=""
+          style={{ width: '100%', height: 'auto', display: 'block' }}
         />
 
         <h2>アートディレクション画像</h2>
+        <Picture
+          src={art_directive_image.default_image.url}
+          width={art_directive_image.default_image.width}
+          height={art_directive_image.default_image.height}
+          artDirevtives={[
+            art_directive_image.md_image !== undefined
+              ? {
+                  src: art_directive_image.md_image.url,
+                  media: '(min-width: 768px)',
+                }
+              : null,
+            art_directive_image.lg_image !== undefined
+              ? {
+                  src: art_directive_image.lg_image.url,
+                  media: '(min-width: 1024px)',
+                }
+              : null,
+            art_directive_image['2xl_image'] !== undefined
+              ? {
+                  src: art_directive_image['2xl_image'].url,
+                  media: '(min-width: 1536px)',
+                }
+              : null,
+          ].flatMap((item) => (item !== null ? [item] : []))}
+          placeholder="blur"
+          alt=""
+          style={{ width: '100%', height: 'auto', display: 'block' }}
+        />
       </main>
     </div>
   )
