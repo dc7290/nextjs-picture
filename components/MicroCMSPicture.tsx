@@ -49,10 +49,11 @@ export const getSources = ({
   formats = FORMATS,
   artDirevtives,
 }: GetSourcesArgs): GetSourcesResult => {
-  const getFotmatParam = (format: string) => format.replace(/^image\//, '')
-  const getSrcSet = (src: string, format?: string) =>
+  const getFotmatParam = (format: string): string =>
+    format.replace(/^image\//, '')
+  const getSrcSet = (src: string, format?: string): string =>
     config.deviceSizes
-      .map(
+      ?.map(
         (deviceSize) =>
           `${loader({
             src,
@@ -61,7 +62,7 @@ export const getSources = ({
             format: format !== undefined ? getFotmatParam(format) : undefined,
           })} ${deviceSize}w`
       )
-      .join(', ')
+      .join(', ') ?? ''
 
   if (artDirevtives !== undefined) {
     if (!Array.isArray(artDirevtives)) {
@@ -101,8 +102,6 @@ export const getSources = ({
     sources: formats.map((format) => ({
       srcSet: getSrcSet(src, format),
       type: format,
-      width,
-      height,
     })),
     preloadLinks: [{ srcSet: getSrcSet(src, 'webp'), type: WEBP }],
   }
@@ -184,8 +183,8 @@ type Props = Omit<
   'src' | 'width' | 'height' | 'blurDataURL' | 'loader' | 'alt'
 > & {
   src: string
-  width: number
-  height: number
+  width?: number
+  height?: number
   alt: string
   artDirevtives?: ArtDirective[]
 }
@@ -209,8 +208,8 @@ const MicroCMSPicture = ({
 
   const sources = getSources({
     src,
-    width: width,
-    height: height,
+    width,
+    height,
     quality: Number(quality),
     config: config,
     artDirevtives,
@@ -221,7 +220,8 @@ const MicroCMSPicture = ({
       <Sources {...sources} sizes={props.sizes} priority={priority} />
       <Image
         {...props}
-        src={src}
+        {...{ src, width, height, quality }}
+        sizes={props.sizes ?? '100vw'}
         loader={loader}
         blurDataURL={
           props.placeholder === 'blur'
