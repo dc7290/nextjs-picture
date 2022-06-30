@@ -54,18 +54,14 @@ describe('MicroCMSPicture', () => {
     it('デフォルトの動作', () => {
       expect(defaultSources.sources).toStrictEqual([
         {
-          height: undefined,
           srcSet:
             'https://remote-image/image.png?fit=max&w=640&q=75&fm=avif 640w, https://remote-image/image.png?fit=max&w=1200&q=75&fm=avif 1200w',
           type: 'image/avif',
-          width: undefined,
         },
         {
-          height: undefined,
           srcSet:
             'https://remote-image/image.png?fit=max&w=640&q=75&fm=webp 640w, https://remote-image/image.png?fit=max&w=1200&q=75&fm=webp 1200w',
           type: 'image/webp',
-          width: undefined,
         },
       ])
       expect(defaultSources.preloadLinks).toStrictEqual([
