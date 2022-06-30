@@ -172,8 +172,10 @@ describe('MicroCMSPicture', () => {
   })
   it('アートディレクションの動作: priorityを設定する', () => {
     render(<Sources {...artDirevtionSources} priority />)
-    screen.getAllByTestId('link').forEach((link, i) => {
-      const preloadLink = artDirevtionSources.preloadLinks[i]
+    const links = screen.getAllByTestId('link')
+
+    artDirevtionSources.preloadLinks.forEach((preloadLink, i) => {
+      const link = links[i]
       expect(link).toHaveAttribute('imagesrcset', preloadLink.srcSet)
       expect(link).toHaveAttribute('type', preloadLink.type)
     })
