@@ -46,6 +46,7 @@ const Home: NextPage<Props> = ({ default_image, art_directive_image }) => {
           height={default_image.height}
           placeholder="blur"
           priority
+          preloadFormat="image/avif"
           alt=""
           style={{ width: '100%', height: 'auto', display: 'block' }}
         />
@@ -55,6 +56,9 @@ const Home: NextPage<Props> = ({ default_image, art_directive_image }) => {
           src={art_directive_image.default_image.url}
           width={art_directive_image.default_image.width}
           height={art_directive_image.default_image.height}
+          placeholder="blur"
+          alt=""
+          style={{ width: '100%', height: 'auto', display: 'block' }}
           artDirevtives={[
             art_directive_image.md_image !== undefined
               ? {
@@ -75,9 +79,6 @@ const Home: NextPage<Props> = ({ default_image, art_directive_image }) => {
                 }
               : null,
           ].flatMap((item) => (item !== null ? [item] : []))}
-          placeholder="blur"
-          alt=""
-          style={{ width: '100%', height: 'auto', display: 'block' }}
         />
       </main>
     </div>

@@ -25,6 +25,7 @@ const defaultSources = getSources({
     deviceSizes: [640, 1200],
   }),
   src: 'https://remote-image/image.png',
+  preloadFormat: 'image/webp',
 })
 const artDirevtionSources = getSources({
   config: createConfig({
@@ -45,6 +46,7 @@ const artDirevtionSources = getSources({
     },
   ],
   src: 'https://remote-image/image.png',
+  preloadFormat: 'image/webp',
 })
 
 describe('MicroCMSPicture', () => {

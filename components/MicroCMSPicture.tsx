@@ -5,12 +5,7 @@ import {
 } from 'next/dist/shared/lib/image-config'
 import Image, { ImageLoaderProps, ImageProps } from 'next/future/image'
 import Head from 'next/head'
-import {
-  DetailedHTMLProps,
-  Fragment,
-  SourceHTMLAttributes,
-  useMemo,
-} from 'react'
+import { DetailedHTMLProps, SourceHTMLAttributes, useMemo } from 'react'
 import useImageConfig from '../hooks/useImageConfig'
 
 type ArtDirective = {
@@ -32,6 +27,7 @@ type GetSourcesArgs = {
   quality?: number
   formats?: string[]
   artDirevtives?: ArtDirective[]
+  preloadFormat: typeof WEBP | typeof AVIF
 }
 type GetSourcesResult = {
   sources: DetailedHTMLProps<
@@ -48,6 +44,7 @@ export const getSources = ({
   quality = 75,
   formats = FORMATS,
   artDirevtives,
+  preloadFormat,
 }: GetSourcesArgs): GetSourcesResult => {
   const getFotmatParam = (format: string): string =>
     format.replace(/^image\//, '')
@@ -91,8 +88,8 @@ export const getSources = ({
     return {
       sources: [...artDirectivesSources, ...defaultSources].flat(),
       preloadLinks: artDirevtives.map(({ src, media }) => ({
-        srcSet: getSrcSet(src, 'webp'),
-        type: WEBP,
+        srcSet: getSrcSet(src, getFotmatParam(preloadFormat)),
+        type: preloadFormat,
         media,
       })),
     }
@@ -103,7 +100,12 @@ export const getSources = ({
       srcSet: getSrcSet(src, format),
       type: format,
     })),
-    preloadLinks: [{ srcSet: getSrcSet(src, 'webp'), type: WEBP }],
+    preloadLinks: [
+      {
+        srcSet: getSrcSet(src, getFotmatParam(preloadFormat)),
+        type: preloadFormat,
+      },
+    ],
   }
 }
 
@@ -187,6 +189,7 @@ type Props = Omit<
   height?: number
   alt: string
   artDirevtives?: ArtDirective[]
+  preloadFormat?: typeof WEBP | typeof AVIF
 }
 
 const MicroCMSPicture = ({
@@ -196,6 +199,7 @@ const MicroCMSPicture = ({
   quality,
   priority,
   artDirevtives,
+  preloadFormat = 'image/webp',
   ...props
 }: Props) => {
   const configContext = useImageConfig()
@@ -213,6 +217,7 @@ const MicroCMSPicture = ({
     quality: Number(quality),
     config: config,
     artDirevtives,
+    preloadFormat,
   })
 
   return (
