@@ -85,13 +85,20 @@ export const getSources = ({
       height,
     }))
 
+    const artDirectivesPreloadLinks = artDirevtives.map(({ src, media }) => ({
+      srcSet: getSrcSet(src, getFotmatParam(preloadFormat)),
+      type: preloadFormat,
+      media,
+    }))
+    const defaultPreloadLink: GetSourcesResult['preloadLinks'][number] = {
+      srcSet: getSrcSet(src, getFotmatParam(preloadFormat)),
+      type: preloadFormat,
+      media: 'not all and ' + artDirectivesPreloadLinks.at(-1)?.media,
+    }
+
     return {
       sources: [...artDirectivesSources, ...defaultSources].flat(),
-      preloadLinks: artDirevtives.map(({ src, media }) => ({
-        srcSet: getSrcSet(src, getFotmatParam(preloadFormat)),
-        type: preloadFormat,
-        media,
-      })),
+      preloadLinks: [...artDirectivesPreloadLinks, defaultPreloadLink],
     }
   }
 

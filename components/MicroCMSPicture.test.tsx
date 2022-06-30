@@ -148,6 +148,12 @@ describe('MicroCMSPicture', () => {
             'https://remote-image/image_md.png?fit=max&w=640&q=75&fm=webp 640w, https://remote-image/image_md.png?fit=max&w=1200&q=75&fm=webp 1200w',
           type: 'image/webp',
         },
+        {
+          media: 'not all and (min-width: 768px)',
+          srcSet:
+            'https://remote-image/image.png?fit=max&w=640&q=75&fm=webp 640w, https://remote-image/image.png?fit=max&w=1200&q=75&fm=webp 1200w',
+          type: 'image/webp',
+        },
       ])
     })
   })
