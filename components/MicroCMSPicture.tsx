@@ -90,7 +90,7 @@ export const getSources = ({
       type: preloadFormat,
       media,
     }))
-    const defaultPreloadLink: GetSourcesResult['preloadLinks'][number] = {
+    const defaultPreloadLink = {
       srcSet: getSrcSet(src, getFotmatParam(preloadFormat)),
       type: preloadFormat,
       media: 'not all and ' + artDirectivesPreloadLinks.at(-1)?.media,
@@ -222,7 +222,7 @@ const MicroCMSPicture = ({
     width,
     height,
     quality: Number(quality),
-    config: config,
+    config,
     artDirevtives,
     preloadFormat,
   })
