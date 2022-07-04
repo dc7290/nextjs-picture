@@ -192,8 +192,8 @@ type Props = Omit<
   'src' | 'width' | 'height' | 'blurDataURL' | 'loader' | 'alt'
 > & {
   src: string
-  width?: number
-  height?: number
+  width: number
+  height: number
   alt: string
   artDirevtives?: ArtDirective[]
   preloadFormat?: typeof WEBP | typeof AVIF
