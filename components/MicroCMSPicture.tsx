@@ -164,18 +164,18 @@ export const Sources = ({
       ))}
 
       {priority &&
-        preloadLinks.map((linkProps) => (
-          <Head key={linkProps.srcSet}>
+        preloadLinks.map(({ srcSet, type, media }) => (
+          <Head key={srcSet}>
             <link
               {...(process.env.NODE_ENV === 'test'
                 ? { 'data-testid': 'link' }
                 : {})}
-              key={'__nimg-' + linkProps.srcSet + linkProps.media + sizes}
+              key={'__nimg-' + srcSet + media + sizes}
               rel="preload"
               as="image"
-              type={linkProps.type}
-              media={linkProps.media}
-              imageSrcSet={linkProps.srcSet}
+              type={type}
+              media={media}
+              imageSrcSet={srcSet}
               imageSizes={sizes}
             />
           </Head>
