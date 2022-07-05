@@ -42,8 +42,8 @@ const Home: NextPage<Props> = ({ default_image, art_directive_image }) => {
         <h2>通常の画像</h2>
         <Picture
           src={default_image.url}
-          width={default_image.width}
-          height={default_image.height}
+          width={default_image.width ?? 0}
+          height={default_image.height ?? 0}
           placeholder="blur"
           priority
           preloadFormat="image/avif"
@@ -54,8 +54,8 @@ const Home: NextPage<Props> = ({ default_image, art_directive_image }) => {
         <h2>アートディレクション画像</h2>
         <Picture
           src={art_directive_image.default_image.url}
-          width={art_directive_image.default_image.width}
-          height={art_directive_image.default_image.height}
+          width={art_directive_image.default_image.width ?? 0}
+          height={art_directive_image.default_image.height ?? 0}
           placeholder="blur"
           alt=""
           style={{ width: '100%', height: 'auto', display: 'block' }}
