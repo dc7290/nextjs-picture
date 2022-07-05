@@ -1,5 +1,4 @@
 import {
-  ImageConfig,
   ImageConfigComplete,
   imageConfigDefault,
 } from 'next/dist/shared/lib/image-config'
@@ -20,7 +19,7 @@ const WEBP = 'image/webp'
 const FORMATS = [AVIF, WEBP]
 
 type GetSourcesArgs = {
-  config: ImageConfig
+  deviceSizes: number[]
   src: string
   width?: number
   height?: number
@@ -37,7 +36,7 @@ type GetSourcesResult = {
   preloadLinks: { srcSet: string; type: string; media?: string }[]
 }
 export const getSources = ({
-  config,
+  deviceSizes,
   src,
   width,
   height,
@@ -49,7 +48,7 @@ export const getSources = ({
   const getFotmatParam = (format: string): string =>
     format.replace(/^image\//, '')
   const getSrcSet = (src: string, format?: string): string =>
-    config.deviceSizes
+    deviceSizes
       ?.map(
         (deviceSize) =>
           `${loader({
@@ -204,17 +203,17 @@ const MicroCMSPicture = ({
   width,
   height,
   quality,
+  alt,
   priority,
   artDirevtives,
   preloadFormat = 'image/webp',
   ...props
 }: Props) => {
   const configContext = useImageConfig()
-  const config: ImageConfig = useMemo(() => {
+  const deviceSizes = useMemo(() => {
     const c = configEnv || configContext || imageConfigDefault
-    const allSizes = [...c.deviceSizes, ...c.imageSizes].sort((a, b) => a - b)
     const deviceSizes = c.deviceSizes.sort((a, b) => a - b)
-    return { ...c, allSizes, deviceSizes }
+    return deviceSizes
   }, [configContext])
 
   const sources = getSources({
@@ -222,7 +221,7 @@ const MicroCMSPicture = ({
     width,
     height,
     quality: Number(quality),
-    config,
+    deviceSizes,
     artDirevtives,
     preloadFormat,
   })
@@ -232,15 +231,13 @@ const MicroCMSPicture = ({
       <Sources {...sources} sizes={props.sizes} priority={priority} />
       <Image
         {...props}
-        {...{ src, width, height, quality }}
+        {...{ src, width, height, quality, loader, alt }}
         sizes={props.sizes ?? '100vw'}
-        loader={loader}
         blurDataURL={
           props.placeholder === 'blur'
             ? loader({ src, width: 8, quality: 10 })
             : undefined
         }
-        alt={props.alt}
         loading={priority ? 'eager' : props.loading}
       />
     </picture>

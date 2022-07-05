@@ -1,8 +1,6 @@
 import '@testing-library/jest-dom'
 
 import { render, screen } from '@testing-library/react'
-import { NextConfig } from 'next'
-import { imageConfigDefault } from 'next/dist/shared/lib/image-config'
 import { ReactElement } from 'react'
 
 import { getSources, Sources } from './MicroCMSPicture'
@@ -16,21 +14,13 @@ jest.mock('next/head', () => {
   }
 })
 
-const createConfig = (customConfig?: NextConfig['images']) => {
-  return Object.assign(imageConfigDefault, customConfig)
-}
-
 const defaultSources = getSources({
-  config: createConfig({
-    deviceSizes: [640, 1200],
-  }),
+  deviceSizes: [640, 1200],
   src: 'https://remote-image/image.png',
   preloadFormat: 'image/webp',
 })
 const artDirevtionSources = getSources({
-  config: createConfig({
-    deviceSizes: [640, 1200],
-  }),
+  deviceSizes: [640, 1200],
   artDirevtives: [
     {
       src: 'https://remote-image/image_lg.png',
