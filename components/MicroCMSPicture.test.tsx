@@ -41,7 +41,7 @@ const artDirevtionSources = getSources({
 
 describe('MicroCMSPicture', () => {
   describe('getSources', () => {
-    it('デフォルトの動作', () => {
+    it('デフォルトの動作で期待通りの値が返ってくることを確認する', () => {
       expect(defaultSources.sources).toStrictEqual([
         {
           srcSet:
@@ -62,7 +62,7 @@ describe('MicroCMSPicture', () => {
         },
       ])
     })
-    it('アートディレクションの動作', () => {
+    it('アートディレクションの動作で期待通りの値が返ってくることを確認する', () => {
       expect(artDirevtionSources.sources).toStrictEqual([
         {
           srcSet:
@@ -148,16 +148,16 @@ describe('MicroCMSPicture', () => {
     })
   })
 
-  it('デフォルトの動作', () => {
+  it('デフォルトの動作をスナップショットテストで確認する', () => {
     render(<Sources {...defaultSources} />)
     expect(screen.getAllByTestId('source')).toMatchSnapshot()
   })
-  it('アートディレクションの動作', () => {
+  it('アートディレクションの動作をスナップショットテストで確認する', () => {
     render(<Sources {...artDirevtionSources} />)
     expect(screen.getAllByTestId('source')).toMatchSnapshot()
   })
 
-  it('デフォルトの動作: priorityを設定する', () => {
+  it('デフォルトの動作でpriorityを設定した時に生成したpreloadLinksと一致するかを確認する', () => {
     render(<Sources {...defaultSources} priority />)
     const preloadLink = defaultSources.preloadLinks[0]
     expect(screen.getByTestId('link')).toHaveAttribute(
@@ -166,7 +166,7 @@ describe('MicroCMSPicture', () => {
     )
     expect(screen.getByTestId('link')).toHaveAttribute('type', preloadLink.type)
   })
-  it('アートディレクションの動作: priorityを設定する', () => {
+  it('アートディレクションの動作でpriorityを設定した時に生成したpreloadLinksと一致するかを確認する', () => {
     render(<Sources {...artDirevtionSources} priority />)
     const links = screen.getAllByTestId('link')
 
