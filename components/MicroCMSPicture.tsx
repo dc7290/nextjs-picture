@@ -49,7 +49,7 @@ export const getSources = ({
     format.replace(/^image\//, '')
   const getSrcSet = (src: string, format?: string): string =>
     deviceSizes
-      ?.map(
+      .map(
         (deviceSize) =>
           `${loader({
             src,
@@ -58,7 +58,7 @@ export const getSources = ({
             format: format !== undefined ? getFotmatParam(format) : undefined,
           })} ${deviceSize}w`
       )
-      .join(', ') ?? ''
+      .join(', ')
 
   if (artDirevtives !== undefined) {
     if (!Array.isArray(artDirevtives)) {
